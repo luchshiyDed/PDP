@@ -33,7 +33,20 @@ public class EmployeeService extends BaseService<Employee>{
             return null;
         }
         createMissingEntities(value);
-        return super.findByNameOrCreate(value);
+        if (value.getEmail()==null){
+            value.setEmail("");
+        }
+        Optional<Employee> oldValue= ((EmployeeRepository)repository).findByEmail(value.getEmail());
+        if(oldValue.isPresent()){
+            return oldValue.get();
+        }
+        if(value.getId()==null){
+            Employee newValue=new Employee();
+            value.setId(value.getId());
+            repository.saveAndFlush(value);
+            return value;
+        }
+        return value;
     }
 
     private void createMissingEntities(Employee employee) {

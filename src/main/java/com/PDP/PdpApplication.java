@@ -50,6 +50,7 @@ public class PdpApplication implements CommandLineRunner {
 		pdProcess.setPdProcessType(pdProcessType);
 		Employee employee=new Employee();
 		employee.setName("Vasya");
+		employee.setEmail("Vasya@mail.com");
 		pdProcess.setEmployee(employee);
 		ICOPD icopd=new ICOPD();
 		icopd.setName("icopd1");
