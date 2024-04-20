@@ -4,10 +4,9 @@ import com.PDP.security.user.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,6 +17,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody UserEntity request){
         return ResponseEntity.ok(authenticationService.register(request));
+    }
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable Long id){
+        authenticationService.deleteUser(id);
+    }
+    @GetMapping("/users")
+    public Iterable<UserEntity> getAll(){
+        return authenticationService.getAll();
     }
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){

@@ -1,5 +1,6 @@
 package com.PDP.controller;
 import com.PDP.model.Employee;
+import com.PDP.model.ICOPD;
 import com.PDP.security.user.UserEntity;
 import com.PDP.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -37,5 +40,16 @@ public class EmployeeController {
     @DeleteMapping("/delete/{id}")
     public void deleteEmployee(Authentication auth,@PathVariable Long id){
         employeeService.deleteById(id);
+    }
+    @PostMapping("/editMany")
+    public void editEmployees(Authentication auth,@RequestBody List<Employee> employees){
+        for(Employee employee1:employees){
+            if(employee1.getId()==null){
+                employeeService.createIfNotExists(employee1);
+                return;
+            }
+
+            employeeService.edit(employee1, employee1.getId());
+        }
     }
 }

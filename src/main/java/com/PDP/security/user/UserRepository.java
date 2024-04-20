@@ -1,4 +1,4 @@
-package com.PDP.repository;
+package com.PDP.security.user;
 
 import com.PDP.security.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

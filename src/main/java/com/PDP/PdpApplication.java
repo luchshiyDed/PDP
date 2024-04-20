@@ -39,7 +39,6 @@ public class PdpApplication implements CommandLineRunner {
 		user1.setName("1");
 		user1.setSubdivision("2");
 		authenticationService.register(user1);
-
 		PDProcess pdProcess=new PDProcess();
 		pdProcess.setName("pd1");
 		PDProcessAction action=new PDProcessAction();
