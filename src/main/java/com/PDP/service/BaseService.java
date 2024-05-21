@@ -11,12 +11,24 @@ import org.springframework.security.core.Authentication;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @SuppressWarnings("unchecked")
 public class BaseService<T extends Nameable> {
     protected final BaseRepository<T,Long> repository;
-
+    public List<String> findByNamePrefix(String prefix){
+        List<T> list=repository.findAll();
+        prefix=prefix.replaceAll("\"","");
+        prefix=prefix.toLowerCase();
+        List<String> strings=new ArrayList<>();
+        for (T t:list) {
+            if(t.getName().toLowerCase().startsWith(prefix)) {
+                strings.add(t.getName());
+            }
+        }
+        return strings.stream().filter(s->s.equals("")).limit(5).toList();
+    }
     private T createInstance(T inst){
         try {
             Constructor<T> t;
@@ -69,6 +81,7 @@ public class BaseService<T extends Nameable> {
         if (value.getName()==null){
             value.setName("");
         }
+        value.setName(value.getName().replaceAll(",",""));
         Optional<T> oldValue= repository.findByName(value.getName());
         if(oldValue.isPresent()){
             return oldValue.get();
@@ -96,6 +109,6 @@ public class BaseService<T extends Nameable> {
         return HttpStatus.OK;
     }
     public List<T> getAll() {
-        return repository.findAll();
+        return repository.findAll().stream().filter(e->!e.getName().equals("")).toList();
     }
 }

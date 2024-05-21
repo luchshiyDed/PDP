@@ -13,15 +13,18 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AWPService extends BaseService<AWP>{
-    public AWPService(AWPRepository repository, ISPDNService ispdnService) {
+public class AWPService extends AuthCheckingService<AWP>{
+    public AWPService(AWPRepository repository, ISPDNService ispdnService, SubdivisionService subdivisionService) {
         super(repository);
         this.ispdnService = ispdnService;
+        this.subdivisionService = subdivisionService;
     }
     @Autowired
     private final ISPDNService ispdnService;
-
+    @Autowired
+    private  final  SubdivisionService subdivisionService;
     private void createMissingEntities(AWP awp) {
+        awp.setSubdivision(subdivisionService.findByNameOrCreate(awp.getSubdivision()));
         if (awp.getIspdns() != null) {
             ArrayList<ISPDN> newISPDNS = new ArrayList<>(awp.getIspdns().size());
             for (ISPDN i : awp.getIspdns()) {

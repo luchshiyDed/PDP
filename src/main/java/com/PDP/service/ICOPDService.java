@@ -3,30 +3,31 @@ package com.PDP.service;
 import com.PDP.model.AWP;
 import com.PDP.model.ICOPD;
 import com.PDP.repository.ICOPDRepository;
+import com.PDP.security.user.UserEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
-public class ICOPDService extends BaseService<ICOPD> {
+public class ICOPDService extends AuthCheckingService<ICOPD> {
 
     @Autowired
     private final AWPService awpService;
     @Autowired
     private final SubdivisionService subdivisionService;
 
-    public ICOPDService(ICOPDRepository repository, AWPService awpService,SubdivisionService subdivisionService) {
+    public ICOPDService(ICOPDRepository repository, AWPService awpService, SubdivisionService subdivisionService) {
 
         super(repository);
-        this.subdivisionService=subdivisionService;
+        this.subdivisionService = subdivisionService;
         this.awpService = awpService;
     }
 
@@ -43,7 +44,7 @@ public class ICOPDService extends BaseService<ICOPD> {
 
     @Override
     public ICOPD findByNameOrCreate(ICOPD value) {
-        if(value==null){
+        if (value == null) {
             return null;
         }
         createMissingEntities(value);
@@ -70,19 +71,24 @@ public class ICOPDService extends BaseService<ICOPD> {
         }
         return HttpStatus.OK;
     }
-    @Override
-    public HttpStatus edit(ICOPD icopd, Long id) {
 
+    public HttpStatus edit(Authentication authentication, ICOPD icopd, Long id) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
         Optional<ICOPD> old = repository.findById(id);
         createMissingEntities(icopd);
         if (old.isEmpty()) {
-            repository.saveAndFlush(icopd);
-            return HttpStatus.CREATED;
+            if (checkAuth(user, icopd)) {
+                repository.saveAndFlush(icopd);
+                return HttpStatus.CREATED;
+            }
+            return HttpStatus.FORBIDDEN;
         }
-
-        icopd.setId(old.get().getId());
-        repository.saveAndFlush(icopd);
-        return HttpStatus.OK;
+        if (checkAuth(user, old.get())) {
+            icopd.setId(old.get().getId());
+            repository.saveAndFlush(icopd);
+            return HttpStatus.OK;
+        }
+        return HttpStatus.FORBIDDEN;
     }
 
 }

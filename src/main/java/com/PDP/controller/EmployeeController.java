@@ -1,12 +1,10 @@
 package com.PDP.controller;
+
 import com.PDP.model.Employee;
-import com.PDP.model.ICOPD;
 import com.PDP.security.user.UserEntity;
 import com.PDP.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,38 +16,34 @@ import java.util.List;
 public class EmployeeController {
     @Autowired
     private final EmployeeService employeeService;
+
     @GetMapping
     public Iterable<Employee> getAllEmployees(Authentication auth) {
-        UserEntity user= (UserEntity) auth.getPrincipal();
-            if(user.getAllSubdivisions())
-                return employeeService.getAll();
-            return employeeService.getAll().stream().filter(employee -> {
-             return employee.getSubdivision().getName().equals(user.getSubdivision());
+        UserEntity user = (UserEntity) auth.getPrincipal();
+        if (user.getAllSubdivisions())
+            return employeeService.getAll();
+        return employeeService.getAll().stream().filter(employee -> {
+            return employee.getSubdivisionName().equals(user.getSubdivision());
         }).toList();
     }
-    @PostMapping("/create")
-    public void createEmployee(Authentication auth,@RequestBody Employee employee){
-        employeeService.createIfNotExists(employee);
+    @PostMapping("/employee")
+    public List<String> getAll(@RequestBody String prefix){
+        return employeeService.findByNamePrefix(prefix);
     }
-    @PostMapping("/edit/{id}")
-    public void editEmployee(Authentication auth,@PathVariable Long id, @RequestBody Employee employee){
 
-        employeeService.edit(employee,id);
-
-    }
     @DeleteMapping("/delete/{id}")
-    public void deleteEmployee(Authentication auth,@PathVariable Long id){
-        employeeService.deleteById(id);
+    public void deleteEmployee(Authentication auth, @PathVariable Long id) {
+        employeeService.delete(auth,id);
     }
-    @PostMapping("/editMany")
-    public void editEmployees(Authentication auth,@RequestBody List<Employee> employees){
-        for(Employee employee1:employees){
-            if(employee1.getId()==null){
-                employeeService.createIfNotExists(employee1);
-                return;
-            }
 
-            employeeService.edit(employee1, employee1.getId());
+    @PostMapping("/editMany")
+    public void editEmployees(Authentication auth, @RequestBody List<Employee> employees) {
+        for (Employee employee1 : employees) {
+            if (employee1.getId() == null) {
+                employeeService.findByNameOrCreate(employee1);
+
+            } else
+                employeeService.edit(auth,employee1, employee1.getId());
         }
     }
 }

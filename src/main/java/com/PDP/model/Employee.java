@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 @Entity
 @Table(name = "employee")
-public class Employee extends Nameable {
+public class Employee extends SubdivisionData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,4 +29,12 @@ public class Employee extends Nameable {
     private AWP awp;
     @ManyToOne
     private Subdivision subdivision;
+
+    @Override
+    public String getSubdivisionName() {
+        if(subdivision==null){
+            return "";
+        }
+        return subdivision.getName();
+    }
 }

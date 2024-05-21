@@ -22,27 +22,20 @@ public class AWPController {
         return awpService.getAll();
     }
 
-    @PostMapping("/create")
-    public void createAWP(Authentication auth,@RequestBody AWP awp) {
-        awpService.createIfNotExists(awp);
-    }
-
-    @PostMapping("/edit/{id}")
-    public void editAWP(Authentication auth,@PathVariable Long id, @RequestBody AWP awp) {
-
-        awpService.edit(awp, id);
-
+    @PostMapping("/awp")
+    public List<String> getAll(@RequestBody String prefix){
+        return awpService.findByNamePrefix(prefix);
     }
 
     @DeleteMapping("/delete/{id}")
     public void deleteAWP(Authentication auth,@PathVariable Long id) {
-        awpService.deleteById(id);
+        awpService.delete(auth,id);
     }
     @PostMapping("/editMany")
     public void editEmployees(Authentication auth,@RequestBody List<AWP> awps){
         for(AWP awp1:awps){
             if(awp1.getId()==null){
-                awpService.createIfNotExists(awp1);
+                awpService.findByNameOrCreate(awp1);
                 return;
             }
 

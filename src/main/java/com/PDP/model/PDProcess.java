@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -15,18 +14,19 @@ import java.util.List;
 @Entity
 @EqualsAndHashCode(callSuper=false)
 @Table(name = "process")
-public class PDProcess extends Nameable {
+public class PDProcess extends SubdivisionData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name="";
-    @ManyToMany
-    private List<PDTarget> pdTargets=new ArrayList<>();
+    @ManyToOne
+    private PDTarget pdTargets;
     @ManyToMany
     private List<PDSubject> pdSubjects=new ArrayList<>();
     @ManyToMany
     private List<PDProcessAction> pdProcessActions=new ArrayList<>();
-    private Date deleteDate=new Date();
+    @ManyToOne
+    private DeleteCondition deleteCondition;
     private String source="";
     private String destination="";
     @ManyToOne
@@ -43,24 +43,22 @@ public class PDProcess extends Nameable {
     @JoinColumn(name="storage_id")
     private PDStorage pdStorage;
     @ManyToOne
+    private PDStorage pdProcessPlace;
+    @ManyToOne
     @JoinColumn(name="document_id")
     private PDDocument pdDocument;
-    @ManyToOne
-    @JoinColumn(name="type_id")
-    private PDType pdType;
-    @ManyToOne
-    @JoinColumn(name="ispdn_id")
-    private ISPDN ispdn;
-    @ManyToOne
-    @JoinColumn(name="icopd_id")
-    private ICOPD icopd;
+    @ManyToMany
+    private List<PDType> pdType=new ArrayList<>();
+//    @ManyToOne
+//    @JoinColumn(name="ispdn_id")
+//    private ISPDN ispdn;
+
+    private Boolean auto=false;
+    @Override
     @JsonIgnore
-    public String getSubdivision(){
-        if (icopd==null){
-            return null;
-        }
-        if(icopd.getSubdivision()==null)
-            return null;
-        return icopd.getSubdivision().getName();
+    public String getSubdivisionName() {
+        if(employee==null)
+            return "";
+        return employee.getSubdivisionName();
     }
 }

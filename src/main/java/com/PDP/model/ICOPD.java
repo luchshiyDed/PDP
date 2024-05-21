@@ -14,7 +14,7 @@ import java.util.List;
 @Entity
 @EqualsAndHashCode(callSuper=false)
 @Table(name = "icopd")
-public class ICOPD extends Nameable {
+public class ICOPD extends SubdivisionData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,4 +26,11 @@ public class ICOPD extends Nameable {
     private Boolean isActive=false;
     private Date activationDate=new Date();
 
+
+    @Override
+    public String getSubdivisionName() {
+        if(subdivision==null)
+            return "";
+        return subdivision.getName();
+    }
 }
